@@ -11,7 +11,13 @@ from parxe.common import Singleton, overrides, serialize, deserialize
 
 @Singleton
 class SeqEngine(EngineInterface):
-    """Sequential engine class"""
+    """Sequential engine class for debugging of PARXE scripts.
+
+    This engine executes all given tasks in sequential order and as they
+    are run by execute() method. Therefore, no parallelism is
+    implemented here, but it is very useful when developing new scripts
+    using PARXE. You can debug your code avoiding parallelism issues.
+    """
 
     def __init__(self):
         """Initializes the engine.
@@ -75,7 +81,7 @@ class SeqEngine(EngineInterface):
     @overrides(EngineInterface)
     def get_max_tasks(self):
         return 1
-    
+
 def get_instance():
     """Wrapper of SeqEngine.get_instance()"""
     return SeqEngine.get_instance()
