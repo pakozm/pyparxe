@@ -58,8 +58,9 @@ class TestCommonFunctions(TestCase):
 
     def test_mktempfile(self):
         f_handler, f_hash = common.mktempfile()
-        self.assertTrue(f_hash in f_handler.name)
-        f_handler.close()
+
+        with f_handler:
+            self.assertTrue(f_hash in f_handler.name)
 
     def test_serialize(self):
         class MockSocket:
@@ -68,7 +69,9 @@ class TestCommonFunctions(TestCase):
             def send(self, data):
                 self.data = data
         socket = MockSocket()
+
         common.serialize(OBJ, socket)
+
         self.assertEqual(socket.data, pkl.dumps(OBJ))
 
     def test_deserialize(self):
@@ -78,7 +81,9 @@ class TestCommonFunctions(TestCase):
 
             def recv(self):
                 return pkl.dumps(OBJ)
+
         obj = common.deserialize(MockSocket())
+
         self.assertEqual(obj, OBJ)
 
 class TestWaitUntilExists(TestCase):
@@ -95,6 +100,7 @@ class TestWaitUntilExists(TestCase):
     def test_wait_until_exists(self):
         t0 = time()
         os.path.isfile.return_value = False
+
         result = common.wait_until_exists(self.filename,
                                           timeout=0.01,
                                           wait_step=0.001)
@@ -102,6 +108,7 @@ class TestWaitUntilExists(TestCase):
         self.assertFalse(result)
 
         os.path.isfile.return_value = True
+
         result = common.wait_until_exists(self.filename)
 
         self.assertTrue(result)
