@@ -67,7 +67,6 @@ class SeqEngine(EngineInterface):
     @overrides(EngineInterface)
     def finished(self, task):
         _ = deserialize(self._client)
-        return True
 
     @overrides(EngineInterface)
     def accepting_tasks(self):

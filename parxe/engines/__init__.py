@@ -29,7 +29,8 @@ class EngineInterface(object):
         raise NotImplementedError
 
     def finished(self, task):
-        """Indicates if the given task object has finished or not"""
+        """Indicates to the engine that a given task object has finished its
+        execution and its output data has been processed"""
         raise NotImplementedError
 
     def accepting_tasks(self):
