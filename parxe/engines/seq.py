@@ -6,7 +6,8 @@ import os
 import nanomsg as nmsg
 import parxe.common as common
 
-from common import Singleton, Overrides, serialize, deserialize
+from parxe.engines import EngineInterface
+from parxe.common import Singleton, overrides, serialize, deserialize
 
 @Singleton
 class SeqEngine(EngineInterface):
@@ -36,7 +37,7 @@ class SeqEngine(EngineInterface):
         self._server_url = None
         self._client_url = None
 
-    @Override
+    @overrides(EngineInterface)
     def connect(self):
         if self._server is None:
             self._server = nmsg.Socket(nmsg.REP)
@@ -45,12 +46,12 @@ class SeqEngine(EngineInterface):
             self._client_endpoint = self._client.connect(self._uri)
         return self._server
 
-    @Overrides
+    @overrides(EngineInterface)
     def abort(self, task):
         """Aborts the given task id"""
         raise NotImplementedError
 
-    @Overrides
+    @overrides(EngineInterface)
     def execute(self, task, stdout, stderr):
         os.chdir(task.wd)
         func = task.func
@@ -61,18 +62,18 @@ class SeqEngine(EngineInterface):
         open(stderr, "w").close()
         serialize({"id":task.id, "result":result,
                    "hash":self._hash, "reply":True},
-                  self.client)
+                  self._client)
 
-    @Overrides
+    @overrides(EngineInterface)
     def finished(self, task):
-        deserialize(self._client)
+        _ = deserialize(self._client)
         return True
 
-    @Overrides
+    @overrides(EngineInterface)
     def accepting_tasks(self):
         return True
 
-    @Overrides
+    @overrides(EngineInterface)
     def get_max_tasks(self):
         return 1
     

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import cPickle as pkl
 import unittest
-from unittest import TestCase
-from mock import MagicMock
 
 import parxe.common as common
+
+from unittest import TestCase
+# from mock import MagicMock
 
 OBJ = {"id":4, "data":"datum"}
 HELLO_WORLD_STR = "Hello World!"
@@ -25,6 +26,20 @@ class TestSingleton(TestCase):
         obj2 = SingletonClass.get_instance()
         self.assertEqual(obj1, obj2)
 
+
+class TestOverrides(TestCase):
+
+    def test_overrides(self):
+        class BaseInterface(object):
+            def __init__(self):
+                pass
+            def foo(self):
+                pass
+        with self.assertRaises(AssertionError):
+            class ConcreteFaultyImplementer(BaseInterface):
+                @common.overrides(BaseInterface)
+                def bar(self):
+                    pass
 
 class TestCommonFunctions(TestCase):
 
@@ -47,7 +62,7 @@ class TestCommonFunctions(TestCase):
         socket = MockSocket()
         common.serialize(OBJ, socket)
         self.assertEqual(socket.data, pkl.dumps(OBJ))
-        
+
     def test_deserialize(self):
         class MockSocket:
             def __init__(self):

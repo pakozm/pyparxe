@@ -7,10 +7,12 @@ import tempfile
 
 DEFAULT_POPEN_BUFSIZE = 4096
 
-class Overrides(object):
-    """Does nothing, just decorator"""
-    def __init__(self, decorated):
-        pass
+def overrides(interface_class):
+    """Throws error if the method doesn't exists"""
+    def overrider(method):
+        assert(method.__name__ in dir(interface_class))
+        return method
+    return overrider
 
 class Singleton(object):
     """
