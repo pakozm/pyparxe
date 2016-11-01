@@ -29,10 +29,10 @@ setup(
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
     ],
-    author='Francisco Zamora-Martinez',
-    author_email='pakozm@gmail.com',
+    author=__author__,
+    author_email=__email__,
     url='https://github.com/pakozm/pyparxe',
     keywords=['pyparxe'],
-    license='MIT',
+    license=__license__,
     test_suite="tests",
 )
