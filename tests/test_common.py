@@ -48,7 +48,7 @@ class TestCommonFunctions(TestCase):
         common.serialize(OBJ, socket)
         self.assertEqual(socket.data, pkl.dumps(OBJ))
         
-    def test_serialize(self):
+    def test_deserialize(self):
         class MockSocket:
             def __init__(self):
                 pass
