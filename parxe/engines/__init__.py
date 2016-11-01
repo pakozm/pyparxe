@@ -17,20 +17,25 @@ class EngineInterface(object):
         pass
 
     def connect(self):
-        """Opens a server connection using nanomsg and returns the socket"""
+        """Opens the engine connection using nanomsg and returns the
+        underlying SP socket for communication"""
         raise NotImplementedError
     
     def abort(self, task):
         """Aborts the given task object"""
         raise NotImplementedError
 
-    def execute(self, task, stdout, stderr):
-        """Executes the given task object gathering output log into stdout and stderr"""
+    def execute(self, task, stdout_path, stderr_path):
+        """Executes the given task object using as output log the given
+        stdout_path and stderr_path"""
         raise NotImplementedError
 
     def finished(self, task):
-        """Indicates to the engine that a given task object has finished its
-        execution and its output data has been processed"""
+        """Use this method to indicate the engine that a particular task
+        has finished its execution.
+
+        The scheduler is responsible to call this method when the task operation
+        finishes."""
         raise NotImplementedError
 
     def accepting_tasks(self):

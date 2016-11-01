@@ -7,16 +7,16 @@ STREAMS = {}
 
 class Socket(object):
     def __init__(self, *args, **kwargs):
-        self._uri = None
+        self.uri = None
 
     def bind(self, uri, *args, **kwargs):
-        self._uri = uri
+        self.uri = uri
 
     def connect(self, uri, *args, **kwargs):
-        self._uri = uri
+        self.uri = uri
 
     def send(self, msg, *args, **kwargs):
-        STREAMS.setdefault(self._uri, []).append(msg)
+        STREAMS.setdefault(self.uri, []).append(msg)
 
     def recv(self, *args, **kwargs):
-        return STREAMS.setdefault(self._uri, []).pop(0)
+        return STREAMS.setdefault(self.uri, []).pop(0)

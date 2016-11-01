@@ -38,9 +38,14 @@ class TestSeqEngine(TestCase):
         args = [4]
         task = Task(ID, func, args=args)
         self.engine.execute(task, STDOUT, STDERR)
-        output = deserialize(socket)
+        output = deserialize(self.engine._client)
 
         self.assertEqual(output["id"], ID)
         self.assertTrue(output["reply"])
         self.assertEqual(output["hash"], self.engine._hash)
         self.assertEqual(output["result"], func(*args))
+
+        self.engine.execute(task, STDOUT, STDERR)
+        self.engine.finished(task)
+
+        self.assertEqual(len(nmsg.STREAMS[socket.uri]), 0)

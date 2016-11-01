@@ -52,14 +52,14 @@ class SeqEngine(EngineInterface):
         raise NotImplementedError
 
     @overrides(EngineInterface)
-    def execute(self, task, stdout, stderr):
+    def execute(self, task, stdout_path, stderr_path):
         os.chdir(task.wd)
         func = task.func
         args = task.args
         kwargs = task.kwargs
         result = func(*args, **kwargs)
-        open(stdout, "w").close()
-        open(stderr, "w").close()
+        open(stdout_path, "w").close()
+        open(stderr_path, "w").close()
         serialize({"id":task.id, "result":result,
                    "hash":self._hash, "reply":True},
                   self._client)
