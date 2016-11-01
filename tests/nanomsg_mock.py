@@ -19,4 +19,4 @@ class Socket(object):
         STREAMS.setdefault(self.uri, []).append(msg)
 
     def recv(self, *args, **kwargs):
-        return STREAMS.setdefault(self.uri, []).pop(0)
+        return STREAMS[self.uri].pop(0)
