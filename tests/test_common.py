@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import cPickle as pkl
-import unittest
+import logging as log
+import os
+
+from time import time
+from unittest import TestCase
+from mock import MagicMock
 
 import parxe.common as common
-
-from unittest import TestCase
-# from mock import MagicMock
 
 OBJ = {"id":4, "data":"datum"}
 HELLO_WORLD_STR = "Hello World!"
@@ -72,3 +74,31 @@ class TestCommonFunctions(TestCase):
                 return pkl.dumps(OBJ)
         obj = common.deserialize(MockSocket())
         self.assertEqual(obj, OBJ)
+
+class TestWaitUntilExists(TestCase):
+    def setUp(self):
+        self.isfile = os.path.isfile
+        self.filename = "/tmp/dummy"
+        os.path.isfile = MagicMock()
+        log.basicConfig(level=log.ERROR)
+
+    def tearDown(self):
+        os.path.isfile = self.isfile
+        log.basicConfig(level=log.INFO)
+
+    def test_wait_until_exists(self):
+        t0 = time()
+        os.path.isfile.return_value = False
+        result = common.wait_until_exists(self.filename,
+                                          timeout=0.01,
+                                          wait_step=0.001)
+
+        self.assertFalse(result)
+
+        os.path.isfile.return_value = True
+        result = common.wait_until_exists(self.filename,
+                                          timeout=0.1,
+                                          wait_step=0.01)
+
+        self.assertTrue(result)
+        self.assertTrue((time() - t0) < 0.02)

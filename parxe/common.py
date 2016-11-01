@@ -3,9 +3,15 @@
 
 import os
 import cPickle as pkl
+import logging as log
+import os
 import tempfile
 
+from time import sleep, time
+
 DEFAULT_POPEN_BUFSIZE = 4096
+DEFAULT_FILESYSTEM_TIMEOUT = 60 # seconds
+DEFAULT_FILESYSTEM_WAIT_STEP = 1 # seconds
 
 def overrides(interface_class):
     """Throws error if the method doesn't exists"""
@@ -70,3 +76,24 @@ def serialize(obj, socket):
 def deserialize(socket):
     """Deserializes one object from the given SP socket"""
     return pkl.loads(socket.recv())
+
+def wait_until_exists(filename,
+                      timeout=DEFAULT_FILESYSTEM_TIMEOUT,
+                      wait_step=DEFAULT_FILESYSTEM_WAIT_STEP):
+    """Waits until the given filename exists.
+
+    Depending on NFS synchronization or similar shared disk storage
+    drivers, it can be necessary to wait for a filename to exists.
+    """
+
+    t0 = time()
+    timedout = False
+    while not os.path.isfile(filename) and not timedout:
+        log.info("Waiting disk sync: %.0f more seconds, %.0f seconds elapsed",
+                 wait_step, time() - t0)
+        sleep(wait_step)
+        if time() - t0 > timeout:
+            log.warning("File system wait timedout!")
+            timedout = True
+        wait_step *= 2.0
+    return not timedout

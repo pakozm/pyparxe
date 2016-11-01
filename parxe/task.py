@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Description"""
+"""This module implements Task class."""
 
 class Task(object):
+    """This class is intented as a simple container of data.
+    
+    It principal attributes are an id value, the working directory in the
+    worker host, the function to be executed, and the args and kwargs required
+    by the function. Finally, the result of the operation will be also tracked
+    by instances of this class."""
     def __init__(self, id, func, working_dir="./", args=[], kwargs={}):
         self._id = id
         self._working_dir = working_dir
