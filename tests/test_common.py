@@ -37,6 +37,12 @@ class TestOverrides(TestCase):
                 pass
             def foo(self):
                 pass
+
+        class ConcreteImplementer(BaseInterface):
+            @common.overrides(BaseInterface)
+            def foo(self):
+                pass
+
         with self.assertRaises(AssertionError):
             class ConcreteFaultyImplementer(BaseInterface):
                 @common.overrides(BaseInterface)
