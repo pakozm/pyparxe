@@ -214,7 +214,7 @@ def _union_do_work(self, args_list):
     self.set_as_running()
     values = list(args_list[:])
     for i, val in enumerate(values):
-        values[i] = val.get()
+        values[i] = _cast(val).get()
     return values
 
 class UnionFuture(Future):
