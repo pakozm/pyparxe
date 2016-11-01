@@ -2,13 +2,12 @@
 import unittest
 import sys
 
-import tests
+from unittest import TestCase
 
 import nanomsg as nmsg
+import tests
 import parxe.engines.seq as seq_engine
 
-from unittest import TestCase
-# from mock import MagicMock
 from parxe.task import Task
 from parxe.common import deserialize
 

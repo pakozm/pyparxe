@@ -5,11 +5,12 @@ import os
 
 from time import time
 from unittest import TestCase
-from mock import MagicMock
+from mock import MagicMock, patch
 
 import parxe.common as common
 
 OBJ = {"id":4, "data":"datum"}
+DUMMY_FILENAME = "/tmp/dummy"
 HELLO_WORLD_STR = "Hello World!"
 
 @common.Singleton
@@ -88,28 +89,23 @@ class TestCommonFunctions(TestCase):
 
 class TestWaitUntilExists(TestCase):
     def setUp(self):
-        self.isfile = os.path.isfile
-        self.filename = "/tmp/dummy"
-        os.path.isfile = MagicMock()
+        self.filename = DUMMY_FILENAME
         log.basicConfig(level=log.ERROR)
 
     def tearDown(self):
-        os.path.isfile = self.isfile
         log.basicConfig(level=log.INFO)
 
     def test_wait_until_exists(self):
         t0 = time()
-        os.path.isfile.return_value = False
-
-        result = common.wait_until_exists(self.filename,
-                                          timeout=0.01,
-                                          wait_step=0.001)
+        with patch('os.path.isfile', MagicMock(return_value=False)):
+            result = common.wait_until_exists(self.filename,
+                                              timeout=0.01,
+                                              wait_step=0.001)
 
         self.assertFalse(result)
 
-        os.path.isfile.return_value = True
-
-        result = common.wait_until_exists(self.filename)
+        with patch('os.path.isfile', MagicMock(return_value=True)):
+            result = common.wait_until_exists(self.filename)
 
         self.assertTrue(result)
-        self.assertTrue((time() - t0) < 0.02)
+        self.assertTrue((time() - t0) < 0.04)
