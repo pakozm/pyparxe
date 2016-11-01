@@ -96,9 +96,7 @@ class TestWaitUntilExists(TestCase):
         self.assertFalse(result)
 
         os.path.isfile.return_value = True
-        result = common.wait_until_exists(self.filename,
-                                          timeout=0.1,
-                                          wait_step=0.01)
+        result = common.wait_until_exists(self.filename)
 
         self.assertTrue(result)
         self.assertTrue((time() - t0) < 0.02)
