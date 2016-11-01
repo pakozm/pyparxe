@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-"""This module implements Future base class and other subclasses.
+"""This module implements Future base class and its subclasses.
 
-Future objects are the result of executing parallel functions. They doesn't
-contain any value, but the application can be stopped waiting the value in case
-it is necessary. This objects wrap some data needed to check when the result is
-available. A function is given during construction to allow future object
-adaptation to different parallel engines.  """
+Future objects are the result of asynchronous functions execution. Their
+value is unknown at construction, so they offer an interface for gathering
+this value when it is computed, or wait until it is available."""
 
 import operator
 import threading
@@ -17,6 +15,7 @@ RUNNING_STATE = "running"
 FINISHED_STATE = "finished"
 
 def _cast(obj):
+    """Casts non Future objects to NonFuture."""
     if isinstance(obj, Future):
         return obj
     else:
@@ -26,19 +25,31 @@ def _thread_run_for_result(future, func, *args):
     """This function executes func(*args) and stores
     its result by means of future.set_result() method."""
     result = func(future, *args)
-    future.set_result(result)
+    future._set_result(result)
 
 class Future(object):
-    """Future class for result of parallel functions execution."""
+    """Future class for result of parallel functions execution.
+
+    Instances of this class execute do_work function given in the
+    constructor using a dedicated Python thread (from threading
+    library). The do_work function has the responsability of
+    indicating the running state of the object by calling
+    set_as_running() method. This do_work function receives
+    as arguments the future object and a variable list of arguments
+    given to __init__ constructor.
+    
+    Example:
+
+    >>> def square(self, x):
+    ...     self.set_as_running()
+    ...     return x**2
+    >>> fut = Future(square, 4)
+    >>> fut.get()
+    16
+    """
 
     def __init__(self, do_work, *args):
-        """do_work(*args) will be executed in a Python thread.
-
-        This constructor prepares the object and executes the thread.
-        It is responsability of do_work function to indicate when the
-        future object is in running state (calling to set_as_running()
-        method).
-        """
+        """do_work(self, *args) will be executed in a Python thread."""
         self._result = None
         self._stdout = None
         self._stderr = None
@@ -59,11 +70,9 @@ class Future(object):
         self._stderr = value
 
     def set_as_running(self):
-        """Starts execution of thread job.
-
-        When the result is ready (or an error happened), the thread will
-        end indicating to the future object that the result is ready.
-        """
+        """Changes the state of the object from pending to running.
+        
+        This method should be called by do_work function."""
         with self._running_condition:
             assert self._state == PENDING_STATE
             self._state = RUNNING_STATE
@@ -74,11 +83,11 @@ class Future(object):
         raise NotImplementedError
 
     def get(self):
-        """Waits until the future is finished and
-        returns the result of this execution.
+        """Waits until the future is finished and returns the result
+        of this execution.
 
-        In case the thread was joined previously, this method just
-        returns the result without any waiting.
+        If the object is in finished state, this method returns the
+        result without any waiting.
         """
         if not self.finished():
             self.wait()
@@ -114,10 +123,12 @@ class Future(object):
                 self._running_condition.wait(timeout)
         return not self.pending()
 
-    def set_result(self, value):
+    def _set_result(self, value):
         """Calling this method stores the result in the future object.
 
-        Besides, this method sets the future state to finished.
+        Besides, this method sets the future state to finished. This
+        method is called by the thread target function and should not
+        be called by anyone else out of this module.
         """
         self._result = value
         self._state = FINISHED_STATE
@@ -153,10 +164,18 @@ class Future(object):
         return self._out
 
     def __str__(self):
-        return "Future in {} state".format(self._state)
+        """Represents a future with a string as:
+        Future in RUNNING state
+        """
+        return "Future in {} state".format(self._state.upper())
 
-    def after(self, func, *args):
-        return ConditionedFuture(func, *args)
+    def after(self, func):
+        """Appends the execution of a function over the output of this Future.
+        
+        The function will be called as func(self.get()) when the result of this
+        Future is ready.
+        """
+        return ConditionedFuture(func, self)
 
     def __add__(self, other):
         return ConditionedFuture(operator.__add__, self, _cast(other))
@@ -193,14 +212,19 @@ def _conditioned_do_work(self, func, *args):
     return func(*values)
 
 class ConditionedFuture(Future):
-    """A Future object which delays the computation of
-    a function which receives Futures as arguments.
+    """A Future class intended to execution of delayed functions.
 
-    All arguments are not forced to be a Future object.
+    The function computation is delayed until all the arguments
+    given in the constructor are finished. It allow to mix together
+    Future and non Future objects.
     """
     def __init__(self, func, *args):
-        super(ConditionedFuture, self).__init__(_conditioned_do_work, func,
-                                                *args)
+        super(ConditionedFuture, self)\
+        .__init__(
+            _conditioned_do_work,
+            func,
+            *args
+        )
 
     @overrides(Future)
     def abort(self):
@@ -218,18 +242,23 @@ def _union_do_work(self, args_list):
     return values
 
 class UnionFuture(Future):
-    """A Future object over a list of Futures."""
+    """A Future over a list of Futures.
+
+    The result of this Future is a list of values.
+    """
     def __init__(self, args_list):
         super(UnionFuture, self).__init__(_union_do_work, args_list)
         self._args_list = args_list
 
     @overrides(Future)
     def get_stdout(self):
+        """The stdout is the concatenation of every Future in the list."""
         stdout = [val.get_stdout() for val in self._args_list]
         return '\n'.join(stdout)
 
     @overrides(Future)
     def get_stderr(self):
+        """The stderr is the concatenation of every Future in the list."""
         stderr = [val.get_stderr() for val in self._args_list]
         return '\n'.join(stderr)
 
@@ -247,7 +276,9 @@ def _non_future_do_work(self, value):
     return value
 
 class NonFuture(Future):
-    """A fake Future wrapping a non future object."""
+    """A fake one wrapping a non future object.
+
+    This class is useful to mix together Future and NonFuture objects."""
     def __init__(self, value):
         super(NonFuture, self).__init__(_non_future_do_work, value)
 
