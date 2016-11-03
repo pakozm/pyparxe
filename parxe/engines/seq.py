@@ -20,10 +20,11 @@ class SeqEngine(EngineInterface):
     """
 
     def __init__(self):
-        """Initializes the engine.
+        """Initializes the engine with default attributes.
 
         This method is not callable directly because this class is a
-        singleton, you should use get_instance() instead"""
+        singleton, you should use get_instance() instead.
+        """
 
         # hash_value is used for identification of this engine client
         # connections

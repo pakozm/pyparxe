@@ -17,36 +17,55 @@ class EngineInterface(object):
         pass
 
     def connect(self):
-        """Opens the engine connection using nanomsg and returns the
-        underlying SP socket for communication"""
+        """connect() -> A nanomsg SP socket
+
+        Opens the engine connection using nanomsg and returns the
+        underlying SP socket for communication.
+        """
         raise NotImplementedError
     
     def abort(self, task):
-        """Aborts the given task object"""
+        """abort(task : Task)
+
+        Aborts the given task object
+        """
         raise NotImplementedError
 
     def execute(self, task, stdout_path, stderr_path):
-        """Executes the given task object using as output log the given
-        stdout_path and stderr_path"""
+        """execute(task : Task, stdout_path : str, stderr_path : str)
+        
+        Executes the given task object using as output log the given
+        stdout_path and stderr_path
+        """
         raise NotImplementedError
 
     def finished(self, task):
-        """Use this method to indicate the engine that a particular task
-        has finished its execution.
+        """finished(task : Task)
 
-        The scheduler is responsible to call this method when the task operation
-        finishes."""
+        Use this method to indicate the engine that a particular task
+        has finished its execution. The scheduler is responsible to call
+        this method when the task operation finishes.
+        """
         raise NotImplementedError
 
     def accepting_tasks(self):
-        """Indicates if this engine accepts more tasks for execution"""
+        """accepting_tasks() -> boolean
+    
+        Indicates if this engine accepts more tasks for execution
+        """
         raise NotImplementedError
 
     def get_max_tasks(self):
-        """Returns the maximum number of supported concurrent task"""
+        """get_max_tasks() -> int
+        
+        Returns the maximum number of supported concurrent task
+        """
         raise NotImplementedError
 
 def get_num_cores():
-    """Returns the number of cores available in the host"""
+    """get_num_cores() -> int
+    
+    Returns the number of cores available in the host.
+    """
     with common.popen("getconf _NPROCESSORS_ONLN") as f:
         return int(f.readline().rstrip())
