@@ -5,9 +5,7 @@ from parxe.common import Singleton, serialize, deserialize
 
 @Singleton
 class Planner(object):
-    """This class purpose is to instantiate a singleton object
-
-    which allow to enqueue tasks for execution.
+    """A class for a singleton object allowing tasks management.
 
     The planner depends on how a particularly chosen engine executes
     the tasks in a particular worker host. When a task is enqueued,

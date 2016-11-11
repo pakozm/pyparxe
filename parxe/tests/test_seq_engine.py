@@ -5,7 +5,7 @@ import sys
 from unittest import TestCase
 
 import nanomsg as nmsg
-import tests
+import parxe.tests as tests
 import parxe.engines.seq as seq_engine
 
 from parxe.task import Task

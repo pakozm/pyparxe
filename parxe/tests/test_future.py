@@ -6,7 +6,7 @@ import unittest
 from unittest import TestCase
 from mock import mock_open, patch, MagicMock
 
-import tests
+import parxe.tests as tests
 
 from parxe.future import (
     Future,
