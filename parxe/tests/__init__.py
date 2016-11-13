@@ -6,5 +6,5 @@ sys.modules['nanomsg'] = __import__(
     globals(),
     locals(),
     ['Socket'],
-    -1
+    -1,
 )

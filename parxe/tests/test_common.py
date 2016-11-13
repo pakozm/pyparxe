@@ -7,6 +7,7 @@ from time import time
 from unittest import TestCase
 from mock import MagicMock, patch
 
+import parxe.tests # should be imported before parxe for proper mocking
 import parxe.common as common
 
 OBJ = {"id":4, "data":"datum"}
@@ -109,3 +110,20 @@ class TestWaitUntilExists(TestCase):
 
         self.assertTrue(result)
         self.assertTrue((time() - t0) < 0.04)
+
+class TestCache(TestCase):
+    def test_cache_call(self):
+        arg = 12
+        return_value = 144
+        func = MagicMock(return_value=return_value)
+
+        result = common.cache(func, arg)
+
+        func.assert_called_once_with(arg)
+        self.assertEqual(result, return_value)
+        func.reset_mock()
+
+        result = common.cache(func, arg)
+
+        func.assert_not_called()
+        self.assertEqual(result, return_value)

@@ -8,7 +8,7 @@ import numpy as np
 from unittest import TestCase
 from mock import mock_open, patch, MagicMock
 
-import parxe.tests as tests
+import parxe.tests # should be imported before parxe for proper mocking
 import parxe as px
 import parxe.engines.seq as seq_engine
 

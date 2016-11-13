@@ -25,6 +25,7 @@ class SeqEngine(EngineInterface):
         This method is not callable directly because this class is a
         singleton, you should use get_instance() instead.
         """
+        # Not necessary: super(SeqEngine, self).__init__()
 
         # hash_value is used for identification of this engine client
         # connections

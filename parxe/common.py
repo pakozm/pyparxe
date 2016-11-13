@@ -97,3 +97,27 @@ def wait_until_exists(filename,
             timedout = True
         wait_step *= 2.0
     return not timedout
+
+def convert_to_inmutable(arg):
+    if isinstance(arg, list) or isinstance(arg, tuple):
+        inmutable = [convert_to_inmutable(i) for i in arg]
+        return tuple(inmutable)
+    else:
+        return arg
+
+@Singleton
+class _Cache(object):
+    def __init__(self):
+        self._cache = {}
+
+    def __call__(self, func, *args):
+        import sys
+        func_cache = self._cache.setdefault(func, {})
+        inmutable_args = convert_to_inmutable(args)
+        if inmutable_args not in func_cache:
+            func_cache[inmutable_args] = func(*args)
+        return func_cache[inmutable_args]
+
+def cache(*args):
+    cache_instance = _Cache.get_instance()
+    return cache_instance(*args)
