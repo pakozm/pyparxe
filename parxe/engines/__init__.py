@@ -62,6 +62,15 @@ class EngineInterface(object):
         """
         raise NotImplementedError
 
+    def set_options(self, options):
+        """set_options(options : dict)
+        
+        Loads the options from the given dictionary.
+        
+        Normally the options dictionary is loaded from a particular
+        config file with a [engine class name] section.
+        """
+
 def get_num_cores():
     """get_num_cores() -> int
     

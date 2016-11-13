@@ -67,7 +67,7 @@ def _as_dict(options_list):
     return {key: value for key, value in options_list}
 
 def _construct_config_parser(config_path):
-    reader = ConfigParser(default=CONFIG_DEFAULTS)
+    reader = ConfigParser(defaults=CONFIG_DEFAULTS)
     reader.read(config_path)
     return reader
 
