@@ -26,7 +26,7 @@ setup(
     setup_requires=setup_requires,
     description='PARallel eXecution Engine for Python.',
     classifiers=[
-        "Development Status :: 0 - Alpha",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
