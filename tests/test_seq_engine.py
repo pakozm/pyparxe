@@ -6,7 +6,6 @@ import sys
 from unittest import TestCase
 from mock import mock_open, patch, MagicMock, Mock
 
-import parxe.tests # should be imported before parxe and nanomsg for mocking
 import nanomsg as nmsg
 import parxe.engines.seq as seq_engine
 

@@ -34,5 +34,5 @@ setup(
     url='https://github.com/pakozm/pyparxe',
     keywords=['pyparxe'],
     license=__license__,
-    test_suite="parxe.tests",
+    test_suite="nose.collector",
 )

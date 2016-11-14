@@ -7,7 +7,6 @@ from time import time
 from unittest import TestCase
 from mock import MagicMock, patch
 
-import parxe.tests # should be imported before parxe for proper mocking
 import parxe.common as common
 
 OBJ = {"id":4, "data":"datum"}
