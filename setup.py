@@ -12,14 +12,18 @@ from distutils.command.build_ext import build_ext
 with open(os.path.join('parxe','__init__.py')) as f:
     exec(f.read())
 
-install_requires = []
+tests_require = ['nose', 'nanomsg']
+install_requires = ['nanomsg']
+setup_requires = ['nanomsg']
 
 setup(
     name='pyparxe',
     version=__version__,
     packages=[str('parxe')],
     ext_modules=[],
+    tests_require=tests_require,
     install_requires=install_requires,
+    setup_requires=setup_requires,
     description='PARallel eXecution Engine for Python.',
     classifiers=[
         "Development Status :: 0 - Alpha",
